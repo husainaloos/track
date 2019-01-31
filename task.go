@@ -1,15 +1,31 @@
 package main
 
-type Status int
+import "errors"
+
+type TaskStatus int
 
 type Task struct {
 	id     string
 	txt    string
 	cat    string
-	status Status
+	status TaskStatus
 }
 
-func NewTask(id string, txt, cat string, status Status) *Task {
+const (
+	TaskStatusCreated TaskStatus = iota
+	TaskStatusStarted
+	TaskStatusPaused
+	TaskStatusDone
+	TaskStatusAbandoned
+)
+
+var (
+	ErrTaskAlreadyDone      error = errors.New("task already done")
+	ErrTaskAlreadyAbandoned       = errors.New("task already abandoned")
+	ErrTaskHasNotStarted          = errors.New("task has not started")
+)
+
+func NewTask(id string, txt, cat string, status TaskStatus) *Task {
 	return &Task{
 		id:     id,
 		txt:    txt,
@@ -18,19 +34,51 @@ func NewTask(id string, txt, cat string, status Status) *Task {
 	}
 }
 
-func (t *Task) ID() string       { return t.id }
-func (t *Task) Txt() string      { return t.txt }
-func (t *Task) Category() string { return t.cat }
-func (t *Task) Status() string   { return t.status }
+func (t *Task) ID() string         { return t.id }
+func (t *Task) Txt() string        { return t.txt }
+func (t *Task) Category() string   { return t.cat }
+func (t *Task) Status() TaskStatus { return t.status }
 
-func (t *Task) Start() {
+func (t *Task) Start() error {
+	if t.status == TaskStatusDone {
+		return ErrTaskAlreadyDone
+	} else if t.status == TaskStatusAbandoned {
+		return ErrTaskAlreadyAbandoned
+	}
+
+	t.status = TaskStatusStarted
+	return nil
 }
 
-func (t *Task) Pause() {
+func (t *Task) Pause() error {
+	if t.status == TaskStatusCreated {
+		return ErrTaskHasNotStarted
+	} else if t.status == TaskStatusDone {
+		return ErrTaskAlreadyDone
+	} else if t.status == TaskStatusAbandoned {
+		return ErrTaskAlreadyAbandoned
+	}
+
+	t.status = TaskStatusPaused
+	return nil
 }
 
-func (t *Task) End() {
+func (t *Task) Finish() error {
+	if t.status == TaskStatusCreated {
+		return ErrTaskHasNotStarted
+	} else if t.status == TaskStatusAbandoned {
+		return ErrTaskAlreadyAbandoned
+	}
+
+	t.status = TaskStatusDone
+	return nil
 }
 
-func (t *Task) Abandon() {
+func (t *Task) Abandon() error {
+	if t.status == TaskStatusDone {
+		return ErrTaskAlreadyDone
+	}
+
+	t.status = TaskStatusAbandoned
+	return nil
 }

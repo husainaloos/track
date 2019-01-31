@@ -31,4 +31,3 @@ The creation of a task should return an id, and this id should be sequential.
 - pause a task by id: `track pause 12`
 - mark a task as done: `track done 12`
 - abandon a task: `track abandon 12`
-

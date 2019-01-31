@@ -12,11 +12,11 @@ func main() {
 
 	switch os.Args[1] {
 	case "create":
-		create(Args[2:])
+		create(os.Args[2:])
 	case "end":
 		end()
 	default:
-		log.Fatalf("unrecognized argument: %s", Args[1])
+		log.Fatalf("unrecognized argument: %s", os.Args[1])
 	}
 }
 
