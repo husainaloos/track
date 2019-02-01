@@ -2,14 +2,13 @@ package main
 
 import "errors"
 
-type TaskStatus int
+var (
+	ErrTaskAlreadyDone      error = errors.New("task already done")
+	ErrTaskAlreadyAbandoned       = errors.New("task already abandoned")
+	ErrTaskHasNotStarted          = errors.New("task has not started")
+)
 
-type Task struct {
-	id     string
-	txt    string
-	cat    string
-	status TaskStatus
-}
+type TaskStatus int
 
 const (
 	TaskStatusCreated TaskStatus = iota
@@ -19,11 +18,12 @@ const (
 	TaskStatusAbandoned
 )
 
-var (
-	ErrTaskAlreadyDone      error = errors.New("task already done")
-	ErrTaskAlreadyAbandoned       = errors.New("task already abandoned")
-	ErrTaskHasNotStarted          = errors.New("task has not started")
-)
+type Task struct {
+	id     string
+	txt    string
+	cat    string
+	status TaskStatus
+}
 
 func NewTask(id string, txt, cat string, status TaskStatus) *Task {
 	return &Task{
